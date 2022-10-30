@@ -1,0 +1,19 @@
+From: Ekaterina Egorova, 30 October 2022 at 22:11
+To: Eugenia Fontanetskaya
+
+Subject: Interview appointment confirmation (November 1, 12:30 PM, Senior Java Developer)
+
+
+Dear Eugenia, 
+
+Thank you for offering me to apply for the position of Senior Java Depelover for Yandex Market services.
+I really appreciate participating in the competition.
+
+The time you proposed, November 1 at 12:30, suits me, I confirm the meeting.
+I expect this to be a video meeting and it will take 1.5 hours.
+
+If I understand correctly, this is the first interview in a series of technical interviews,
+its format is livecoding and its subject is algorithms. Correct me please if I am wrong.
+
+Sincerely,
+Ekaterina Egorova
