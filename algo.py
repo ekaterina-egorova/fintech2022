@@ -11,7 +11,7 @@ def cancel_order(placed, timestamp):
 class Context(object):
     passive_lifetime_mc = 10 * 1000 * 1000 # 10 sec
     aggressive_lifetime_mc = 1 * 1000 * 1000 # 1 sec
-    part_of_level_amount = 0.01
+    part_of_level_amount = 0.1
     amount_trend_multiplier = 2
 
     def __init__(self, buy_sell, amount):
@@ -45,8 +45,8 @@ class Context(object):
 
     def calc_base_plan(self, asks, bids):
         if self.buy_sell == 'buy':
-            return get_base_plan_for_amount(self.remaining_amount, asks)
-        return get_base_plan_for_amount(self.remaining_amount, bids)
+            return get_base_plan_for_amount(self.remaining_amount, self.buy_sell, asks)
+        return get_base_plan_for_amount(self.remaining_amount, self.buy_sell, bids)
 
     def calc_base_price(self, asks, bids):
         self.base_plan = self.calc_base_plan(asks, bids)
@@ -92,8 +92,8 @@ class Context(object):
 
         price = best_level[0]
         amount = self.remaining_amount \
-            if self.remaining_amount < best_level[1] * amount_trend * Context.part_of_level_amount \
-            else best_level[1] * amount_trend * Context.part_of_level_amount
+            if self.remaining_amount < best_level[1] * amount_trend * Context.part_of_level_amount / best_level[1] \
+            else best_level[1] * amount_trend * Context.part_of_level_amount / best_level[1]
         
         return price, amount, 'passive' if is_good_price_trend else 'aggressive'
 
@@ -242,14 +242,14 @@ def execute_huge_order(buy_sell, amount, prices_csv_file_name, start_timestamp =
     return context
 
 
-def get_base_plan_for_amount(remaining_amount, prices):
+def get_base_plan_for_amount(remaining_amount, buy_sell, prices):
     orders = []
     remaining = remaining_amount
     i = 0
     while remaining > 0 and i < len(prices):
         p = prices[i]
-        amount = min(remaining, p[1])
-        order = Order('buy', amount, p[0], 'aggressive', 'limit', None)
+        amount = min(remaining, p[1]/p[0])
+        order = Order(buy_sell, amount, p[0], 'aggressive', 'limit', None)
         orders.append(order)
 
         remaining = remaining - amount
@@ -267,7 +267,7 @@ def calc_avg_price(plan):
 def get_volume(orders):
     volume = 0.0
     for order in orders:
-        volume = volume + order[1]
+        volume = volume + order[1]/order[0] # to usd btc
     return volume
 
 def get_all_volume_by_side(buy_sell, asks, bids):
@@ -282,8 +282,8 @@ def try_execute(order, other_side_best_level):
         return order
     return None
 
-# timestamps in mc
-execution_context = execute_huge_order('buy', 400000, 'deribit_book_snapshot_25_2020-04-01_BTC-PERPETUAL.csv') #, start_timestamp=1585699201275000, end_timestamp=1585699201275000 + 300000000) # 5 min
+# timestamps in mc, amount in bitcoins
+execution_context = execute_huge_order('buy', 50, 'deribit_book_snapshot_25_2020-04-01_BTC-PERPETUAL.csv') #, start_timestamp=1585699201275000, end_timestamp=1585699201275000 + 300000000) # 5 min
 print(execution_context)
 
 #print('Execution list:')
