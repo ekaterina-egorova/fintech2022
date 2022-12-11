@@ -1,14 +1,14 @@
-Hi I am Katya, founder of Crowly, the best crowdsourcing digital platform on the street.
+Hi i am Katya, founder of Veche, the best crowdsourcing digital platform on the street.
 
-Crowdsourcing literally means getting people outside of your company to work for you.
+Crowdsourcing literally means getting people outside of your company to work for you. 
 
-Lets say you have a business service and you want to test its quality by 1000 of people.
-Or let say your business use clever AI models, and you need crowds of people to teach them to make right decisions.
-You define the tasks, the success criteria, Crowly give you the complete end-to-end solution
-It will find people who will do the tasks, with the best quality, and for the optimal price.
+Veche give you the end-to-end product solution when you have huge amount of simple tasks that need to be done by humans, but don’t require special expertise or training - so you want to outsource to the external crowds.
+Such scenarios usually come when you need to improve algorithms in modern technologies such as self-driving vehicles, smart web searches, advanced voice assistants and e-commerce. 
+Or lets simply say your business have clever AI models, and you need 1000 people to teach them to make right decisions.  
 
-Crowly has access to millions of users who love the platform for making them extra money outside their normal jobs.
+With Veche you simple define the tasks and the completion criteria. And Veche will take care of it. 
+It find right people to do the tasks, and will use efficient algorithms to ensure it is completed fast, with the best quality, and for the optimal price.
+There are competitors on the market with similar digital platforms, but none of them can boast 15 years of experience in crowdsourcing.
 
-The platform have 15 years expertise with crowdsourcing solutions for multiple industries. 
-Trust your crowdsourcing demand to professionals.
+And what really differentiates Veche is that it has audience of millions of users, who know the platform, and love it for making them extra money.
 
