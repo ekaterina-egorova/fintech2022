@@ -3,7 +3,7 @@ import itertools
 
 
 def cancel_order(placed, timestamp):
-    print(f'Cancelled order with id {placed.id}')
+    print(f'Cancelled order with id {placed.id} at {timestamp}, was active {(timestamp - placed.placed_timestamp)/1000000} sec')
     placed.state = 'cancel'
     placed.cancelled_timestamp = timestamp
 
@@ -11,14 +11,14 @@ def cancel_order(placed, timestamp):
 class Context(object):
     passive_lifetime_mc = 10 * 1000 * 1000 # 10 sec
     aggressive_lifetime_mc = 1 * 1000 * 1000 # 1 sec
-    part_of_level_amount = 0.1
+    part_of_level_amount = 0.01
     amount_trend_multiplier = 2
 
     def __init__(self, buy_sell, amount):
         self.buy_sell = buy_sell
         self.amount = amount
         self.remaining_amount = amount
-        self.current_price = 0.0
+        self.avg_execution_price = 0.0
         self.base_plan = []
         self.base_price = None
         self.placed = []
@@ -33,14 +33,14 @@ class Context(object):
                f'placed={len(self.placed)}, ' \
                f'executed={len(self.executed)}, ' \
                f'base_price={self.base_price}, ' \
-               f'current_price={self.current_price}]'
+               f'avg_execution_price={self.avg_execution_price}]'
     
     def is_executed(self):
         return 0.001 > self.remaining_amount > -0.001
 
-    def add_executed(self, order): # todo support partial fills, support market orders 
+    def add_executed(self, order): # todo support partial fills, support market orders
         self.executed.append(order)
-        self.current_price = (self.current_price * (self.amount - self.remaining_amount) + order.price * order.amount)/(self.amount - self.remaining_amount + order.amount)
+        self.avg_execution_price = (self.avg_execution_price * (self.amount - self.remaining_amount) + order.price * order.amount)/(self.amount - self.remaining_amount + order.amount)
         self.remaining_amount = self.remaining_amount - order.amount
 
     def calc_base_plan(self, asks, bids):
@@ -89,13 +89,20 @@ class Context(object):
         best_level = asks[0]
         if (is_good_price_trend and self.buy_sell == 'buy') or (not is_good_price_trend and self.buy_sell == 'sell'):
             best_level = bids[0]
-        
+
         price = best_level[0]
         amount = self.remaining_amount \
             if self.remaining_amount < best_level[1] * amount_trend * Context.part_of_level_amount \
             else best_level[1] * amount_trend * Context.part_of_level_amount
         
         return price, amount, 'passive' if is_good_price_trend else 'aggressive'
+
+    def count_placed_orders(self):
+        count = 0
+        for order in self.placed:
+            if order.state =='placed':
+                count = count + 1
+        return count
     
     def place_order(self, timestamp, price, amount, aggressive_passive):  
         order = Order(self.buy_sell, amount, price, 
@@ -124,6 +131,7 @@ class Context(object):
                 executed.executed_timestamp = timestamp
                 self.add_executed(executed)
                 print(f'Executed {order.buy_sell} order with id {executed.id} on price {executed.price}, ask={_asks[0][0]}, bid={_bids[0][0]}')
+                #print(self)
 
         return True
     
@@ -207,10 +215,11 @@ def subscribe_on_prices(context, prices_csv_file_name, start_timestamp = None, e
                 context.cancel_all_orders(timestamp)
                 print(f'Time is up end_timestamp={end_timestamp}, timestamp = {timestamp}')
                 return
-            
-            price, amount, aggressive_passive = context.calc_order_values(asks, bids)
-            context.place_order(timestamp, price, amount, aggressive_passive)
-            
+
+            if context.count_placed_orders() == 0:
+                price, amount, aggressive_passive = context.calc_order_values(asks, bids)
+                context.place_order(timestamp, price, amount, aggressive_passive)
+
             i = i + 1
 
 
@@ -274,12 +283,13 @@ def try_execute(order, other_side_best_level):
     return None
 
 # timestamps in mc
-execution_context = execute_huge_order('sell', 400000, 'deribit_book_snapshot_25_2020-04-01_BTC-PERPETUAL.csv', start_timestamp=1585699201275000, end_timestamp=1585699201275000 + 300000000) # 5 min
+execution_context = execute_huge_order('buy', 400000, 'deribit_book_snapshot_25_2020-04-01_BTC-PERPETUAL.csv') #, start_timestamp=1585699201275000, end_timestamp=1585699201275000 + 300000000) # 5 min
 print(execution_context)
 
-print('Execution list:')
-print(*execution_context.executed)
+#print('Execution list:')
+#print(*execution_context.executed)
 
-print('Order book on execution:')
-print(*execution_context.executed[0].execution_asks)
-print(*execution_context.executed[0].execution_bids)
+#print('Order book on execution:')
+#print(*execution_context.executed[0].execution_asks)
+#print(*execution_context.executed[0].execution_bids)
+
