@@ -1,4 +1,4 @@
-Hi i am Katya, founder of Crowly, the best crowdsourcing digital platform on the street.
+Hi I am Katya, founder of Crowly, the best crowdsourcing digital platform on the street.
 
 Crowdsourcing literally means getting people outside of your company to work for you.
 
